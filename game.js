@@ -49,7 +49,7 @@ let game = {
         for(let key in this.sprites) {
             this.sprites[key] = new Image();
             this.sprites[key].src = "img/" + key + ".png";
-            this.sprites[key].addEventListener("load",onImageLoad)
+            this.sprites[key].addEventListener("load",onImageLoad);
        
             }
         
@@ -70,11 +70,14 @@ let game = {
         }
     },
     update(){
-        this.platform.move();
-        this.ball.move();
-        this.ball.collideWorldBounds();
         this.collideBlocks();
         this.collidePlatform();
+        this.ball.collideWorldBounds();
+        this.platform.collideWorldBounds();
+        this.platform.move();
+        this.ball.move();
+        
+       
     },
     collideBlocks(){
         for(let block of this.blocks){
@@ -99,7 +102,7 @@ let game = {
         this.ctx.clearRect(0,0,this.width, this.height)
         this.ctx.drawImage(this.sprites.background, 0, 0)
         this.ctx.drawImage(this.sprites.ball, 0, 0, this.ball.width, this.ball.height,
-         this.ball.x, this.ball.y, this.ball.width, this.ball.height);
+            this.ball.x, this.ball.y, this.ball.width, this.ball.height);
         this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
         this.renderBlocks();
     },
@@ -163,20 +166,20 @@ game.ball ={
         let ballLeft=x;
         let ballRight =ballLeft+this.width;
         let ballTop=y;
-        let ballBotom = ballTop+ this.height;
+        let ballBotom= ballTop+ this.height;
 
-        let wordLeft = 0;
+        let worldLeft = 0;
         let worldRight= game.width;
-        let worlTop = 0;
+        let worldTop = 0;
         let worldBottom = game.height;
 
-        if (ballLeft< wordLeft){
+        if (ballLeft< worldLeft){
             this.x=0
             this.dx = this.velocity;
         } else if (ballRight > worldRight){
             this.x =worldRight - this.width;
             this.dx = -this.velocity;
-        }else if (ballTop < worlTop){
+        }else if (ballTop < worldTop){
             this.y=0;
             this.dy = this.velocity;
         }else if (ballBotom > worldBottom){
@@ -188,9 +191,13 @@ game.ball ={
         block.active = false
     },
     bumpPlatform(platform){
+        if (platform.dx){
+            this.x += platform.dx;
+        }
+
+
         if (this.dy >0){
             this.dy = -this.velocity;
-        
         let touchX = this.x + this.width/2;
         this.dx = this.velocity * platform.getTouchOffset(touchX);
         }
@@ -213,7 +220,7 @@ game.platform = {
     },
     start(direction){
         if(direction===KEYS.LEFT){
-            this.dx =-this.velocity;
+            this.dx = -this.velocity;
         }else if (direction===KEYS.RIGHT){
             this.dx=this.velocity;
         
@@ -228,7 +235,7 @@ move(){
         this.x += this.dx;
         if(this.ball){
             this.ball.x+=this.dx;
-        }
+             }
         }
     } ,
     getTouchOffset(x){
@@ -236,6 +243,17 @@ move(){
         let offset = this.width - diff;
         let result= 2* offset/this.width;
         return result -1
+    },
+    collideWorldBounds(){
+        let x = this.x + this.dx;
+        let platformLeft = x;
+        let platformRight = platformLeft+this.width;
+        let worldLeft = 0;
+        let worldRight = game.width;
+
+        if (platformLeft < worldLeft || platformRight> worldRight){
+            this.dx =0;
+        }
     } 
 };
 
