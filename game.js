@@ -28,8 +28,8 @@ let game = {
         this.ctx = document.getElementById("mycanvas").getContext("2d");
         this.setTextFont();
         this.setEvents();
-        this.platform = Object.create(this.platform); // Initialize platform
-        this.ball = Object.create(this.ball); // Initialize ball
+        this.platform = Object.create(this.platform); 
+        this.ball = Object.create(this.ball); 
     },
     setTextFont() {
         this.ctx.font = "20px Arial";
@@ -69,7 +69,7 @@ let game = {
             this.sprites[key].addEventListener("load", onResourceLoad);
             this.sprites[key].addEventListener("error", () => {
                 console.error(`Failed to load image: img/${key}.png`);
-                onResourceLoad(); // Continue loading other resources
+                onResourceLoad(); 
             });
         }
     },
@@ -79,7 +79,7 @@ let game = {
             this.sounds[key].addEventListener("canplaythrough", onResourceLoad, { once: true });
             this.sounds[key].addEventListener("error", () => {
                 console.error(`Failed to load audio: sounds/${key}.mp3`);
-                onResourceLoad(); // Continue loading other resources
+                onResourceLoad(); 
             });
         }
     },
@@ -138,10 +138,17 @@ let game = {
     render() {
         this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.drawImage(this.sprites.background, 0, 0);
+        // Исправлено: использование frame для выбора кадра анимации
         this.ctx.drawImage(
             this.sprites.ball,
-            0, 0, this.ball.width, this.ball.height,
-            this.ball.x, this.ball.y, this.ball.width, this.ball.height
+            this.ball.frame * this.ball.width, // рассчитываем кадр
+            0,
+            this.ball.width,
+            this.ball.height,
+            this.ball.x,
+            this.ball.y,
+            this.ball.width,
+            this.ball.height
         );
         this.ctx.drawImage(this.sprites.platform, this.platform.x, this.platform.y);
         this.renderBlocks();
@@ -179,16 +186,26 @@ game.ball = {
     y: 280,
     width: 20,
     height: 20,
+    frame: 0, // Инициализируем кадр анимации
     start() {
-        this.dy = -this.velocity
+        this.dy = -this.velocity;
         this.dx = game.random(-this.velocity, this.velocity);
+        this.animate();
+    },
+    animate(){
+        setInterval(() => {
+            ++this.frame;
+            if (this.frame > 3){
+                this.frame = 0;
+            }
+        }, 100);
     },
     move() {
         if (this.dy) {
             this.y += this.dy;
         }
         if (this.dx) {
-            this.x += this.dx
+            this.x += this.dx;
         }
     },
     collide(element) {
