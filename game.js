@@ -12,7 +12,7 @@ let game = {
     blocks: [],
     score: 0,
     rows: 6,    
-    cols: 10,   
+    cols: 8,   
     width: 640,
     height: 360,
     sprites: {
